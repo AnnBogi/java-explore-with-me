@@ -54,7 +54,7 @@ public class StatsClient extends BaseClient {
         param.put("unique", viewStatsRequest.isUnique());
         String path = "/stats?start={start}&end={end}&unique={unique}";
         if (viewStatsRequest.getUris() != null && !viewStatsRequest.getUris().isEmpty()) {
-            param.put("uris", viewStatsRequest.getUris());
+            param.put("uris", String.join(",",  viewStatsRequest.getUris()));
             path += "&uris={uris}";
         }
         return get(path, param);

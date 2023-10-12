@@ -5,7 +5,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.practicum.ewm.stats.dto.AppName;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Accessors(chain = true)
@@ -18,11 +23,11 @@ public class EndpointHit {
     long id;
 
     @Enumerated(EnumType.STRING)
-    private AppName app;
+    AppName app;
 
-    private String ip;
+    String ip;
 
-    private String uri;
+    String uri;
 
-    private LocalDateTime timestamp;
+    LocalDateTime timestamp;
 }
