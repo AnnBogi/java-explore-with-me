@@ -25,10 +25,12 @@ public class CompilationService {
     @Transactional
     public Compilation postCompilation(Compilation compilation) {
         compilation = compilationRepository.save(compilation);
-        List<Long> eventIds = compilation.getEvents().stream()
-                .map(Event::getId).collect(Collectors.toList());
+        List<Long> eventIds = compilation.getEvents()
+                                         .stream()
+                                         .map(Event::getId)
+                                         .collect(Collectors.toList());
         List<Event> events = eventRepository.findAllById(eventIds);
-        if (events.size() > 0) {
+        if (!events.isEmpty()) {
             compilation.setEvents(events);
         }
         return compilation;

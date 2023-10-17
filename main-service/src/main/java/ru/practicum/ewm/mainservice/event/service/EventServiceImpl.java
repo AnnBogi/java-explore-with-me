@@ -12,13 +12,13 @@ import ru.practicum.ewm.mainservice.event.dto.request_param.EventRequestParamete
 import ru.practicum.ewm.mainservice.event.entity.Event;
 import ru.practicum.ewm.mainservice.event.repository.EventRepository;
 import ru.practicum.ewm.mainservice.event.repository.EventRepositoryCustom;
-import ru.practicum.ewm.mainservice.exception.AccessDeniedException;
-import ru.practicum.ewm.mainservice.exception.ConditionNotMetException;
-import ru.practicum.ewm.mainservice.exception.NotFoundException;
 import ru.practicum.ewm.mainservice.location.Location;
 import ru.practicum.ewm.mainservice.location.LocationRepository;
 import ru.practicum.ewm.mainservice.user.entity.User;
 import ru.practicum.ewm.mainservice.user.repository.UserRepository;
+import ru.practicum.mainservice.exception.AccessDeniedException;
+import ru.practicum.mainservice.exception.ConditionNotMetException;
+import ru.practicum.mainservice.exception.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -147,7 +147,7 @@ public class EventServiceImpl implements EventService {
     private void configureModelMapper() {
         modelMapper.getConfiguration()
                 .setPropertyCondition(Conditions.isNotNull())
-                .setPropertyCondition((context) -> {
+                .setPropertyCondition(context -> {
                             Object sourceValue = context.getSource();
                             Object destinationValue = context.getDestination();
                             return sourceValue != null && !sourceValue.equals(destinationValue);

@@ -1,7 +1,6 @@
 package ru.practicum.ewm.mainservice.category.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/categories")
 @RequiredArgsConstructor
 @Validated
-@Slf4j
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -30,7 +28,6 @@ public class CategoryController {
     @GetMapping
     public List<CategoryDto> getAll(@PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                     @Positive @RequestParam(defaultValue = "10") int size) {
-        log.info("Get categories {} - {}", from, from + size);
         return categoryService
                 .findCategory(from, size)
                 .stream()
@@ -40,7 +37,6 @@ public class CategoryController {
 
     @GetMapping("/{categoryId}")
     public CategoryDto getById(@Positive @PathVariable long categoryId) {
-        log.info("Get category by ID: {}", categoryId);
         return categoryMapper.toDto(categoryService.findById(categoryId));
     }
 }

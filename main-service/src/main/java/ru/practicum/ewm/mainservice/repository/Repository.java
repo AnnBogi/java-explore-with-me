@@ -2,7 +2,7 @@ package ru.practicum.ewm.mainservice.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
-import ru.practicum.ewm.mainservice.exception.NotFoundException;
+import ru.practicum.mainservice.exception.NotFoundException;
 
 import java.util.Optional;
 

@@ -23,6 +23,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Repository
 public class EventRepositoryCustom {
+    private static final String ID = "id";
+    private static final String INITIATOR = "initiator";
+    private static final String STATE = "state";
+    private static final String CATEGORY = "category";
+    private static final String EVENT_DATE = "eventDate";
+
     private final EntityManager entityManager;
 
     public List<Event> findEventsByInitiatorId(long initiatorId, int from, int size) {
@@ -32,7 +38,7 @@ public class EventRepositoryCustom {
         Root<Event> eventRoot = getEventRootWithFetchAll(criteria.query);
 
         criteria.query.select(eventRoot)
-                .where(criteria.builder.equal(eventRoot.get("initiator"), initiatorId));
+                .where(criteria.builder.equal(eventRoot.get(INITIATOR), initiatorId));
 
         TypedQuery<Event> typedQuery = entityManager.createQuery(criteria.query);
         typedQuery.setFirstResult(from);
@@ -49,8 +55,8 @@ public class EventRepositoryCustom {
 
         criteria.query.select(eventRoot)
                 .where(
-                        criteria.builder.equal(eventRoot.get("id"), eventId),
-                        criteria.builder.equal(eventRoot.get("state"), state)
+                        criteria.builder.equal(eventRoot.get(ID), eventId),
+                        criteria.builder.equal(eventRoot.get(STATE), state)
                 );
 
         return entityManager.createQuery(criteria.query).getResultStream().findFirst();
@@ -64,8 +70,8 @@ public class EventRepositoryCustom {
 
         criteria.query.select(eventRoot)
                 .where(
-                        criteria.builder.equal(eventRoot.get("id"), eventId),
-                        criteria.builder.equal(eventRoot.get("initiator"), userId)
+                        criteria.builder.equal(eventRoot.get(ID), eventId),
+                        criteria.builder.equal(eventRoot.get(INITIATOR), userId)
                 );
 
         return entityManager.createQuery(criteria.query).getResultStream().findFirst();
@@ -78,15 +84,19 @@ public class EventRepositoryCustom {
         Root<Event> eventRoot = getEventRootWithFetchAll(criteria.query);
         List<Predicate> predicates = new ArrayList<>();
 
-        predicates.add(criteria.builder.equal(eventRoot.get("state"), State.PUBLISHED));
+        predicates.add(criteria.builder.equal(eventRoot.get(STATE), State.PUBLISHED));
 
         if (parameters.getText() != null) {
-            predicates.add(criteria.builder.like(criteria.builder.lower(eventRoot.get("annotation")),
-                    "%" + parameters.getText().toLowerCase() + "%"));
+            predicates.add(
+                criteria.builder.like(
+                    criteria.builder.lower(eventRoot.get("annotation")),
+                    "%" + parameters.getText().toLowerCase() + "%"
+                ));
         }
 
         if (parameters.getCategories() != null && !parameters.getCategories().isEmpty()) {
-            predicates.add(criteria.builder.in(eventRoot.get("category").get("id")).value(parameters.getCategories()));
+            predicates.add(criteria.builder.in(eventRoot.get(CATEGORY).get(ID))
+                                           .value(parameters.getCategories()));
         }
 
         if (parameters.isPaid()) {
@@ -94,12 +104,12 @@ public class EventRepositoryCustom {
         }
 
         if (parameters.getRangeStart() != null) {
-            predicates.add(criteria.builder.greaterThanOrEqualTo(eventRoot.get("eventDate"),
+            predicates.add(criteria.builder.greaterThanOrEqualTo(eventRoot.get(EVENT_DATE),
                     parameters.getRangeStart()));
         }
 
         if (parameters.getRangeEnd() != null) {
-            predicates.add(criteria.builder.lessThanOrEqualTo(eventRoot.get("eventDate"),
+            predicates.add(criteria.builder.lessThanOrEqualTo(eventRoot.get(EVENT_DATE),
                     parameters.getRangeEnd()));
         }
 
@@ -112,7 +122,7 @@ public class EventRepositoryCustom {
 
         if (parameters.getSort() != null) {
             if (parameters.getSort() == Sort.EVENT_DATE) {
-                criteria.query.orderBy(criteria.builder.asc(eventRoot.get("eventDate")));
+                criteria.query.orderBy(criteria.builder.asc(eventRoot.get(EVENT_DATE)));
             } else if (parameters.getSort() == Sort.VIEWS) {
                 criteria.query.orderBy(criteria.builder.asc(eventRoot.get("views")));
             }
@@ -132,24 +142,27 @@ public class EventRepositoryCustom {
         List<Predicate> predicates = new ArrayList<>();
 
         if (parameters.getUsers() != null && !parameters.getUsers().isEmpty()) {
-            predicates.add(eventRoot.get("initiator").get("id").in(parameters.getUsers()));
+            predicates.add(eventRoot.get(INITIATOR).get(ID)
+                                    .in(parameters.getUsers()));
         }
 
         if (parameters.getStates() != null && !parameters.getStates().isEmpty()) {
-            predicates.add(eventRoot.get("state").in(parameters.getStates()));
+            predicates.add(eventRoot.get(STATE)
+                                    .in(parameters.getStates()));
         }
 
         if (parameters.getCategories() != null && !parameters.getCategories().isEmpty()) {
-            predicates.add(eventRoot.get("category").get("id").in(parameters.getCategories()));
+            predicates.add(eventRoot.get(CATEGORY).get(ID)
+                                    .in(parameters.getCategories()));
         }
 
         if (parameters.getRangeStart() != null) {
-            predicates.add(criteria.builder.greaterThanOrEqualTo(eventRoot.get("eventDate"),
+            predicates.add(criteria.builder.greaterThanOrEqualTo(eventRoot.get(EVENT_DATE),
                     parameters.getRangeStart()));
         }
 
         if (parameters.getRangeEnd() != null) {
-            predicates.add(criteria.builder.lessThanOrEqualTo(eventRoot.get("eventDate"),
+            predicates.add(criteria.builder.lessThanOrEqualTo(eventRoot.get(EVENT_DATE),
                     parameters.getRangeEnd()));
         }
 
@@ -174,8 +187,8 @@ public class EventRepositoryCustom {
     private Root<Event> getEventRootWithFetchAll(CriteriaQuery<Event> query) {
         Root<Event> eventRoot = query.from(Event.class);
 
-        eventRoot.fetch("initiator");
-        eventRoot.fetch("category");
+        eventRoot.fetch(INITIATOR);
+        eventRoot.fetch(CATEGORY);
         eventRoot.fetch("location");
         return eventRoot;
     }

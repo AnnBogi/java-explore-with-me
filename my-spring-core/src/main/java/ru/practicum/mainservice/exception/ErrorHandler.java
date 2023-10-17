@@ -1,4 +1,4 @@
-package ru.practicum.ewm.mainservice.exception;
+package ru.practicum.mainservice.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -9,15 +9,17 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import ru.practicum.ewm.stats.dto.Variables;
 
 import javax.validation.ConstraintViolationException;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @ControllerAdvice
 public class ErrorHandler {
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
     @ExceptionHandler
     public ResponseEntity<ApiError> handler(Throwable e) {
@@ -75,7 +77,7 @@ public class ErrorHandler {
                 .setMessage(e.getMessage())
                 .setReason(reason)
                 .setStatus(status)
-                .setTimestamp(LocalDateTime.now().format(Variables.FORMATTER));
+                .setTimestamp(LocalDateTime.now().format(FORMATTER));
     }
 
     private ResponseEntity<ApiError> createResponse(ApiError error) {

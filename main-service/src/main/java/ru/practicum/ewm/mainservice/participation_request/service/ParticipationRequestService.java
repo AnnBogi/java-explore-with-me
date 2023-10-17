@@ -5,14 +5,14 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewm.mainservice.event.State;
 import ru.practicum.ewm.mainservice.event.entity.Event;
 import ru.practicum.ewm.mainservice.event.repository.EventRepository;
-import ru.practicum.ewm.mainservice.exception.ConditionNotMetException;
-import ru.practicum.ewm.mainservice.exception.NotFoundException;
 import ru.practicum.ewm.mainservice.participation_request.Status;
 import ru.practicum.ewm.mainservice.participation_request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.mainservice.participation_request.entity.ParticipationRequest;
 import ru.practicum.ewm.mainservice.participation_request.repository.ParticipationRequestRepository;
 import ru.practicum.ewm.mainservice.user.entity.User;
 import ru.practicum.ewm.mainservice.user.repository.UserRepository;
+import ru.practicum.mainservice.exception.ConditionNotMetException;
+import ru.practicum.mainservice.exception.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -93,9 +93,13 @@ public class ParticipationRequestService {
         return considerRequest;
     }
 
-    private Map<Boolean, List<ParticipationRequest>> consedRequests(EventRequestStatusUpdateRequest updateStatusRequest, List<ParticipationRequest> requests, AtomicInteger limit) {
+    private Map<Boolean, List<ParticipationRequest>> consedRequests(
+        EventRequestStatusUpdateRequest updateStatusRequest,
+        List<ParticipationRequest> requests,
+        AtomicInteger limit) {
+
         return requests.stream()
-                .peek(request -> {
+                .map(request -> {
                     if (request.getStatus() == Status.CONFIRMED) {
                         throw new ConditionNotMetException("");
                     }
@@ -108,6 +112,7 @@ public class ParticipationRequestService {
                             request.setStatus(Status.REJECTED);
                         }
                     }
+                    return request;
                 })
                 .collect(Collectors.partitioningBy(request -> request.getStatus() == Status.CONFIRMED));
     }

@@ -17,21 +17,29 @@ import java.time.LocalDateTime;
 @Setter
 public abstract class BaseEventDto {
 
-    @Size(min = 20, max = 2000, groups = {Marker.OnCreation.class, Marker.OnUpdate.class})
+    @Size(min = 20,
+          max = 2000,
+          groups = {Marker.OnCreation.class, Marker.OnUpdate.class})
     @NotBlank(groups = Marker.OnCreation.class)
     private String annotation;
 
     @JsonFormat(pattern = Variables.DATE_FORMAT)
     @NotNull(groups = Marker.OnCreation.class)
-    @FutureDateTime(hours = 2, message = "Date must be at least 2 hours in the future", groups = {Marker.OnCreation.class, Marker.OnUpdate.class})
+    @FutureDateTime(hours = 2,
+                    message = "Date must be at least 2 hours in the future",
+                    groups = {Marker.OnCreation.class, Marker.OnUpdate.class})
     private LocalDateTime eventDate;
 
-    @NotNull(groups = Marker.OnCreation.class, message = Variables.MUST_NOT_BE_BLANK)
+    @NotNull(groups = Marker.OnCreation.class,
+             message = Variables.MUST_NOT_BE_BLANK)
     private LocationDto location;
 
     private Boolean paid;
 
-    @Size(min = 3, max = 120, groups = {Marker.OnCreation.class, Marker.OnUpdate.class})
-    @NotBlank(groups = Marker.OnCreation.class, message = Variables.MUST_NOT_BE_BLANK)
+    @Size(min = 3,
+          max = 120,
+          groups = {Marker.OnCreation.class, Marker.OnUpdate.class})
+    @NotBlank(groups = Marker.OnCreation.class,
+              message = Variables.MUST_NOT_BE_BLANK)
     private String title;
 }

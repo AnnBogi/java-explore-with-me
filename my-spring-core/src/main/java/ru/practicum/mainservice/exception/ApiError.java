@@ -1,4 +1,4 @@
-package ru.practicum.ewm.mainservice.exception;
+package ru.practicum.mainservice.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

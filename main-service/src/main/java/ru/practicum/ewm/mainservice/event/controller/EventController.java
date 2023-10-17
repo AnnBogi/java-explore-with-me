@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,10 +17,10 @@ import ru.practicum.ewm.mainservice.event.dto.request_param.EventRequestParamete
 import ru.practicum.ewm.mainservice.event.entity.Event;
 import ru.practicum.ewm.mainservice.event.mapper.EventMapper;
 import ru.practicum.ewm.mainservice.event.service.EventService;
-import ru.practicum.ewm.mainservice.exception.StatsRequestException;
 import ru.practicum.ewm.stats.client.StatsClient;
 import ru.practicum.ewm.stats.dto.ViewStat;
 import ru.practicum.ewm.stats.dto.ViewStatsRequest;
+import ru.practicum.mainservice.exception.StatsRequestException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
@@ -29,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
+
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
@@ -52,7 +51,7 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto getEvent(@PathVariable @Positive long eventId, HttpServletRequest request) throws JsonProcessingException {
+    public EventFullDto getEvent(@PathVariable @Positive long eventId, HttpServletRequest request)  {
         Event event = eventService.findPublishedEventById(eventId);
 
         String uri = request.getRequestURI().replaceAll("/$", "");

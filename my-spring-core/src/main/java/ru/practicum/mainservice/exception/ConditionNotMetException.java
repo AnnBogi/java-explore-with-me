@@ -1,4 +1,4 @@
-package ru.practicum.ewm.mainservice.exception;
+package ru.practicum.mainservice.exception;
 
 import java.text.MessageFormat;
 

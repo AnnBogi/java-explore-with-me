@@ -1,16 +1,14 @@
 package ru.practicum.ewm.mainservice.category.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.mainservice.category.entity.Category;
 import ru.practicum.ewm.mainservice.category.repository.CategoryRepository;
 import ru.practicum.ewm.mainservice.event.repository.EventRepository;
-import ru.practicum.ewm.mainservice.exception.ConditionNotMetException;
+import ru.practicum.mainservice.exception.ConditionNotMetException;
 
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CategoryService {
@@ -30,7 +28,7 @@ public class CategoryService {
     }
 
     public void deleteById(long categoryId) {
-        if (eventRepository.findByCategoryId(categoryId).size() > 0) {
+        if (!eventRepository.findByCategoryId(categoryId).isEmpty()) {
             throw new ConditionNotMetException("The category is not empty");
         }
         categoryRepository.deleteById(categoryId);

@@ -1,7 +1,6 @@
 package ru.practicum.ewm.mainservice.compilation.repository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.ewm.mainservice.compilation.entity.Compilation;
 import ru.practicum.ewm.mainservice.event.entity.Event;
@@ -15,14 +14,12 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor
 @Repository
 public class CompilationRepositoryCustom {
     private final EntityManager entityManager;
 
     public List<Compilation> findCompilations(Boolean pinned, int from, int size) {
-        log.info("Find compilation with parameters: pinned={}, from={}, size={}", pinned, from, size);
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Compilation> criteriaQuery = criteriaBuilder.createQuery(Compilation.class);
