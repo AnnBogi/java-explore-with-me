@@ -1,8 +1,8 @@
 package ru.practicum.ewm.mainservice.event.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.mainservice.category.entity.Category;
 import ru.practicum.ewm.mainservice.category.repository.CategoryRepository;
@@ -31,8 +31,8 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final EventRepositoryCustom eventRepositoryCustom;
     private final LocationRepository locationRepository;
-
-    private final ModelMapper modelMapper = new ModelMapper();
+    @Qualifier("modelMapperEventService")
+    private final ModelMapper modelMapper;
 
     @Override
     public Event save(Event event) {
@@ -125,7 +125,6 @@ public class EventServiceImpl implements EventService {
             event.setLocation(locationRepository.save(updateLocation));
         }
 
-        configureModelMapper();
         modelMapper.map(updateEvent, event);
         if (event.getState() == State.PUBLISHED) {
             event.setPublishedOn(LocalDateTime.now());
@@ -142,16 +141,5 @@ public class EventServiceImpl implements EventService {
         if (updateEvent.getState() == State.CANCELED && event.getState() == State.PUBLISHED) {
             throw new ConditionNotMetException("Cannot  canceled  the event because it is PUBLISHED");
         }
-    }
-
-    private void configureModelMapper() {
-        modelMapper.getConfiguration()
-                .setPropertyCondition(Conditions.isNotNull())
-                .setPropertyCondition(context -> {
-                            Object sourceValue = context.getSource();
-                            Object destinationValue = context.getDestination();
-                            return sourceValue != null && !sourceValue.equals(destinationValue);
-                        }
-                );
     }
 }

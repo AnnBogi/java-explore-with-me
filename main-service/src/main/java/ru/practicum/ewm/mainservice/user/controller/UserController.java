@@ -60,7 +60,7 @@ public class UserController {
     @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> getRequestByUserId(@PathVariable @Positive long userId) {
         log.info("Get a participation request by user with ID {}", userId);
-        List<ParticipationRequest> requests = participationRequestService.readRequestByUserId(userId);
+        List<ParticipationRequest> requests = participationRequestService.getRequestByUserId(userId);
         return getRequestDtoList(requests);
     }
 

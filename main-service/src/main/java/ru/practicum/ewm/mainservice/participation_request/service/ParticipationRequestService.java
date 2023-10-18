@@ -17,7 +17,6 @@ import ru.practicum.mainservice.exception.NotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,34 +28,36 @@ public class ParticipationRequestService {
     private final UserRepository userRepository;
 
     public ParticipationRequest createRequest(long userId, long eventId) {
+      Event event = getEventOrThrowException(userId, eventId);
 
-        Event event = getEventOrThrowException(userId, eventId);
-
-        User requester = userRepository.findByIdOrThrowNotFoundException(userId, "User");
-        ParticipationRequest participationRequest = new ParticipationRequest()
-                .setCreated(LocalDateTime.now())
-                .setRequester(requester)
-                .setEvent(event);
-
-        if (event.getRequestModeration() && event.getParticipantLimit() > 0) {
-            participationRequest.setStatus(Status.PENDING);
+      final Status requestStatus;
+      if (event.getRequestModeration() && event.getParticipantLimit() > 0) {
+          requestStatus = Status.PENDING;
         } else {
             int countParticipants = event.getConfirmedRequests();
             if (countParticipants != 0 && countParticipants >= event.getParticipantLimit()) {
                 throw new ConditionNotMetException("The requested action cannot be completed due to reaching " +
                         "the participation limit. Limit: {0}", event.getParticipantLimit());
+            } else {
+              requestStatus = Status.CONFIRMED;
+              event.setConfirmedRequests(countParticipants + 1);
             }
-            participationRequest.setStatus(Status.CONFIRMED);
-            event.setConfirmedRequests(countParticipants + 1);
         }
 
-
-        participationRequest = requestRepository.save(participationRequest);
-
-        return participationRequest;
+        final ParticipationRequest participationRequest = createParticipationRequest(userId, event, requestStatus);
+        return requestRepository.save(participationRequest);
     }
 
-    public List<ParticipationRequest> readRequestByUserId(long userId) {
+    private ParticipationRequest createParticipationRequest(long userId, Event event, Status requestStatus) {
+        User requester = userRepository.findByIdOrThrowNotFoundException(userId, "User");
+        return new ParticipationRequest()
+                .setCreated(LocalDateTime.now())
+                .setRequester(requester)
+                .setStatus(requestStatus)
+                .setEvent(event);
+    }
+
+    public List<ParticipationRequest> getRequestByUserId(long userId) {
         User requester = userRepository.findByIdOrThrowNotFoundException(userId, "User");
         return requestRepository.findAllByRequester(requester);
     }
@@ -81,8 +82,8 @@ public class ParticipationRequestService {
             throw new NotFoundException("Request from event with id={0} was not found", eventId);
         }
         Event event = requests.get(0).getEvent();
-        AtomicInteger limit = new AtomicInteger(event.getParticipantLimit() - event.getConfirmedRequests());
-        if (limit.get() <= 0) {
+        int limit = event.getParticipantLimit() - event.getConfirmedRequests();
+        if (limit <= 0) {
             throw new ConditionNotMetException("The participant limit has been reached");
         }
         Map<Boolean, List<ParticipationRequest>> considerRequest = consedRequests(updateStatusRequest, requests, limit);
@@ -96,17 +97,17 @@ public class ParticipationRequestService {
     private Map<Boolean, List<ParticipationRequest>> consedRequests(
         EventRequestStatusUpdateRequest updateStatusRequest,
         List<ParticipationRequest> requests,
-        AtomicInteger limit) {
+        final int limit) {
 
         return requests.stream()
                 .map(request -> {
                     if (request.getStatus() == Status.CONFIRMED) {
-                        throw new ConditionNotMetException("");
+                        throw new ConditionNotMetException("Request status is already - " + Status.CONFIRMED);
                     }
                     if (updateStatusRequest.getStatus() == EventRequestStatusUpdateRequest.Status.REJECTED) {
                         request.setStatus(Status.REJECTED);
                     } else {
-                        if (limit.getAndDecrement() > 0) {
+                        if (limit > 0) {
                             request.setStatus(Status.CONFIRMED);
                         } else {
                             request.setStatus(Status.REJECTED);

@@ -1,8 +1,8 @@
 package ru.practicum.ewm.mainservice.compilation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.mainservice.compilation.entity.Compilation;
@@ -20,7 +20,8 @@ public class CompilationService {
     private final CompilationRepository compilationRepository;
     private final CompilationRepositoryCustom compilationRepositoryCustom;
     private final EventRepository eventRepository;
-    private final ModelMapper modelMapper = new ModelMapper();
+    @Qualifier("modelMapperCompilationService")
+    private final ModelMapper modelMapper;
 
     @Transactional
     public Compilation postCompilation(Compilation compilation) {
@@ -54,8 +55,6 @@ public class CompilationService {
     public Compilation patchCompilation(Compilation updateCompilation) {
         Compilation compilation = compilationRepository.findByIdOrThrowNotFoundException(updateCompilation.getId(),
                 "Compilation");
-        modelMapper.getConfiguration()
-                .setPropertyCondition(Conditions.isNotNull());
         modelMapper.map(updateCompilation, compilation);
         return compilationRepository.save(compilation);
     }
