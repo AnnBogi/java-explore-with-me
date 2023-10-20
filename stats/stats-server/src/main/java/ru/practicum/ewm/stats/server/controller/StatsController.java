@@ -2,6 +2,7 @@ package ru.practicum.ewm.stats.server.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,13 +27,14 @@ public class StatsController {
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
+    @Validated
     public EndpointHitDto hit(@RequestBody EndpointHitDto hitDto) {
         EndpointHit hit = statsService.save(endpointHitMapper.fromDto(hitDto));
         return endpointHitMapper.toDto(hit);
     }
 
     @GetMapping("/stats")
-    public List<ViewStat> viewStat(ViewStatsRequest viewStatsRequest) {
+    public List<ViewStat> viewStat(@Validated ViewStatsRequest viewStatsRequest) {
         return statsService.getStats(viewStatsRequest);
     }
 }

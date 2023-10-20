@@ -8,9 +8,9 @@ import lombok.experimental.Accessors;
 @Getter
 @Accessors(chain = true)
 public class ViewStat {
-    private AppName app;
+    AppName app;
 
-    private String uri;
+    String uri;
 
-    private long hits;
+    long hits;
 }
