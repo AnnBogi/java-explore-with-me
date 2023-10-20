@@ -3,7 +3,7 @@ package ru.practicum.ewm.mainservice.event.dto;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.ewm.mainservice.util.Marker;
-import ru.practicum.ewm.stats.dto.Variables;
+import ru.practicum.mainservice.constants.Variables;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;

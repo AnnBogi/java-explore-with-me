@@ -76,3 +76,18 @@ CREATE TABLE IF NOT EXISTS public.participation_request
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uk_participation_request_event_requester ON public.participation_request (event_id, requester_id);
+
+CREATE TABLE IF NOT EXISTS public.comments
+(
+    id           BIGSERIAL PRIMARY KEY,
+    created      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    edited       TIMESTAMP WITHOUT TIME ZONE,
+    comment      VARCHAR(2048) NOT NULL,
+    event_id     BIGINT NOT NULL REFERENCES public.events (id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+    author_id    BIGINT NOT NULL REFERENCES public.users (id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+    is_initiator BOOLEAN NOT NULL,
+    CONSTRAINT uk_comment_event_requester UNIQUE (event_id, author_id, comment)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS event_author_comment_uniq
+    ON public.comments (event_id, author_id, comment);

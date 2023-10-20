@@ -2,8 +2,8 @@ package ru.practicum.ewm.mainservice.event.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.practicum.dto.UserShortDto;
 import ru.practicum.ewm.mainservice.category.dto.CategoryDto;
-import ru.practicum.ewm.mainservice.user.dto.UserShortDto;
 
 @Getter
 @Setter

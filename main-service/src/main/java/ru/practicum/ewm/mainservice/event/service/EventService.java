@@ -1,8 +1,8 @@
 package ru.practicum.ewm.mainservice.event.service;
 
-import ru.practicum.ewm.mainservice.event.dto.request_param.AdminEventRequestParameters;
-import ru.practicum.ewm.mainservice.event.dto.request_param.EventRequestParameters;
 import ru.practicum.ewm.mainservice.event.entity.Event;
+import ru.practicum.ewm.mainservice.repository.AdminEventRequestParameters;
+import ru.practicum.ewm.mainservice.repository.EventRequestParameters;
 
 import java.util.List;
 

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.ewm.stats.dto.AppName;
 import ru.practicum.ewm.stats.dto.EndpointHitDto;
-import ru.practicum.ewm.stats.dto.Variables;
 import ru.practicum.ewm.stats.dto.ViewStatsRequest;
+import ru.practicum.mainservice.constants.Variables;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;

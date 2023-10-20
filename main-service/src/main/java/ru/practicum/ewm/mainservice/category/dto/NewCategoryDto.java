@@ -2,7 +2,7 @@ package ru.practicum.ewm.mainservice.category.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.ewm.stats.dto.Variables;
+import ru.practicum.mainservice.constants.Variables;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
