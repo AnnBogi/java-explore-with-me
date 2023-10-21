@@ -1,9 +1,10 @@
 package ru.practicum.ewm.mainservice.event.repository;
 
 public final class EventTable {
-  private EventTable(){
+  private EventTable() {
     //utility class
   }
+
   public static final String ID = "id";
   public static final String ANNOTATION = "annotation";
   public static final String INITIATOR = "initiator";
