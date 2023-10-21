@@ -21,21 +21,24 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
+
+
   private final EntityManager entityManager;
 
   @Override
   public List<Comment> getComments(long eventId, int from, int size) {
     log.info("Find comments with parameters: eventId={}, from={}, size={}", eventId, from, size);
 
-    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Comment> criteriaQuery = criteriaBuilder.createQuery(Comment.class);
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Comment> cq = cb.createQuery(Comment.class);
 
-    Root<Comment> commentRoot = criteriaQuery.from(Comment.class);
-    commentRoot.fetch("author");
+    Root<Comment> commentRoot = cq.from(Comment.class);
+    commentRoot.fetch(CommentsTable.AUTHOR);
 
-    criteriaQuery.select(commentRoot).where(criteriaBuilder.equal(commentRoot.get("event"), eventId));
+    cq.select(commentRoot)
+                 .where(cb.equal(commentRoot.get(CommentsTable.EVENT), eventId));
 
-    TypedQuery<Comment> typedQuery = entityManager.createQuery(criteriaQuery)
+    TypedQuery<Comment> typedQuery = entityManager.createQuery(cq)
                                                   .setFirstResult(from)
                                                   .setMaxResults(size);
 
@@ -46,15 +49,16 @@ class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
   public List<Comment> getCommentsByUserId(long userId, int from, int size) {
     log.info("Find comments by UserId={}, from={}, size={}", userId, from, size);
 
-    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Comment> criteriaQuery = criteriaBuilder.createQuery(Comment.class);
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Comment> cq = cb.createQuery(Comment.class);
 
-    Root<Comment> commentRoot = criteriaQuery.from(Comment.class);
-    commentRoot.fetch("author");
+    Root<Comment> commentRoot = cq.from(Comment.class);
+    commentRoot.fetch(CommentsTable.AUTHOR);
 
-    criteriaQuery.select(commentRoot).where(criteriaBuilder.equal(commentRoot.get("author"), userId));
+    cq.select(commentRoot)
+                 .where(cb.equal(commentRoot.get(CommentsTable.AUTHOR), userId));
 
-    TypedQuery<Comment> typedQuery = entityManager.createQuery(criteriaQuery)
+    TypedQuery<Comment> typedQuery = entityManager.createQuery(cq)
                                                   .setFirstResult(from)
                                                   .setMaxResults(size);
 
@@ -65,19 +69,19 @@ class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
   public Map<Long, Long> countEvent(List<Long> eventIds) {
     log.info("Find comments count by list Events.");
 
-    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<CommentCount> criteriaQuery = criteriaBuilder.createQuery(CommentCount.class);
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<CommentCount> cq = cb.createQuery(CommentCount.class);
 
-    Root<Comment> commentRoot = criteriaQuery.from(Comment.class);
+    Root<Comment> commentRoot = cq.from(Comment.class);
 
-    Expression<Long> eventExpression = commentRoot.get("event").get("id");
+    Expression<Long> eventExpression = commentRoot.get(CommentsTable.EVENT).get(CommentsTable.ID);
     Predicate eventPredicate = eventExpression.in(eventIds);
 
-    criteriaQuery.multiselect(eventExpression, criteriaBuilder.count(commentRoot));
-    criteriaQuery.groupBy(eventExpression);
-    criteriaQuery.where(eventPredicate);
+    cq.multiselect(eventExpression, cb.count(commentRoot));
+    cq.groupBy(eventExpression);
+    cq.where(eventPredicate);
 
-    return entityManager.createQuery(criteriaQuery).getResultStream()
+    return entityManager.createQuery(cq).getResultStream()
                         .collect(Collectors.toMap(CommentCount::getEventId, CommentCount::getCount));
 
   }
