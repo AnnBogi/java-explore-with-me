@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.Nulls;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.practicum.mainservice.constants.Variables;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;

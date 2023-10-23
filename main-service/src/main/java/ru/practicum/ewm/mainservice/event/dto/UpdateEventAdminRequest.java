@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.ewm.mainservice.util.Marker;
 import ru.practicum.ewm.mainservice.validation.FutureDateTime;
-import ru.practicum.ewm.stats.dto.Variables;
+import ru.practicum.mainservice.constants.Variables;
 
 import java.time.LocalDateTime;
 

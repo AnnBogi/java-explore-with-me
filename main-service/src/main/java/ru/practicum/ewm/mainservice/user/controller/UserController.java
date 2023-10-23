@@ -13,6 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.ewm.mainservice.comment.dto.CommentDto;
+import ru.practicum.ewm.mainservice.comment.dto.CommentRequestDto;
+import ru.practicum.ewm.mainservice.comment.entity.Comment;
+import ru.practicum.ewm.mainservice.comment.mapper.CommentMapper;
+import ru.practicum.ewm.mainservice.comment.service.CommentService;
+import ru.practicum.ewm.mainservice.entity.ParticipationRequest;
 import ru.practicum.ewm.mainservice.event.dto.NewEventDto;
 import ru.practicum.ewm.mainservice.event.dto.ResponseEventDto;
 import ru.practicum.ewm.mainservice.event.dto.UpdateEventDtoUserRequest;
@@ -22,7 +28,6 @@ import ru.practicum.ewm.mainservice.event.service.EventService;
 import ru.practicum.ewm.mainservice.participation_request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.mainservice.participation_request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.mainservice.participation_request.dto.ParticipationRequestDto;
-import ru.practicum.ewm.mainservice.participation_request.entity.ParticipationRequest;
 import ru.practicum.ewm.mainservice.participation_request.mapper.ParticipationRequestMapper;
 import ru.practicum.ewm.mainservice.participation_request.service.ParticipationRequestService;
 import ru.practicum.ewm.mainservice.user.service.UserService;
@@ -47,6 +52,9 @@ public class UserController {
     public final UserService userService;
     public final EventService eventService;
     public final ParticipationRequestService participationRequestService;
+
+    public final CommentMapper commentMapper;
+    public final CommentService commentService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{userId}/requests")
@@ -89,7 +97,7 @@ public class UserController {
                                                                      EventRequestStatusUpdateRequest request) {
         log.info("Patch requests of participants in event with ID={} from initiator with ID={}", eventId, userId);
         Map<Boolean, List<ParticipationRequest>> requests = participationRequestService
-                .updateRequestsFromInitiator(userId, eventId, request);
+                .patchRequestsFromInitiator(userId, eventId, request);
         EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
         result.setConfirmedRequests(requests.get(true).stream()
                 .map(participationRequestMapper::toDto)
@@ -115,10 +123,10 @@ public class UserController {
                                                      @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("Get events for user id: {}", userId);
         List<Event> eventsByInitiator = eventService.findEventsByInitiator(userId, from, size);
-        return eventsByInitiator
-                .stream()
-                .map(eventMapper::toShortDto)
-                .collect(Collectors.toList());
+        Map<Long, Long> commentCounts = commentService.getCountsByEvents(eventsByInitiator);
+        return eventsByInitiator.stream()
+                                .map(event -> eventMapper.toShortDto(event, commentCounts.getOrDefault(event.getId(), 0L)))
+                                .collect(Collectors.toList());
     }
 
     @GetMapping("/{userId}/events/{eventId}")
@@ -138,6 +146,39 @@ public class UserController {
         Event event = eventMapper.fromUpdateUserRequest(eventUserRequest, eventId);
         event = eventService.updateEventByUser(event, userId);
         return eventMapper.toFullDto(event);
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{userId}/comments")
+    public CommentDto createComment(@PathVariable @Positive long userId,
+                                    @RequestParam @Positive long eventId,
+                                    @RequestBody @Validated CommentRequestDto commentRequestDto) {
+        log.info("Create comment: \"{}\". For Event with ID={}, from User with ID={}",
+                 commentRequestDto.getComment(), eventId, userId);
+        Comment comment = commentMapper.fromDto(commentRequestDto);
+        comment = commentService.createComment(comment, eventId, userId);
+        return commentMapper.toDto(comment);
+    }
+
+    @PatchMapping("/{userId}/comments/{commentId}")
+    public CommentDto patchComment(@PathVariable @Positive long commentId,
+                                   @PathVariable @Positive long userId,
+                                   @RequestBody @Validated CommentRequestDto commentRequestDto) {
+        log.info("Patch comment: \"{}\". For Comment with ID={}, from User with ID={}",
+                 commentRequestDto.getComment(), commentId, userId);
+        Comment comment = commentMapper.fromDto(commentRequestDto);
+        comment = commentService.patchCommentById(comment, commentId, userId);
+        return commentMapper.toDto(comment);
+    }
+
+    @GetMapping("/{userId}/comments")
+    public List<CommentDto> getCommentsByUserId(@PathVariable @Positive long userId,
+                                                @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                @RequestParam(defaultValue = "10") @Positive int size) {
+        log.info("Get comments by user ID={}, from={}, size={}", userId, from, size);
+        return commentService.getCommentsByUserId(userId, from, size).stream()
+                             .map(commentMapper::toDto)
+                             .collect(Collectors.toList());
     }
 
     private void setDefaultValue(NewEventDto eventDto) {

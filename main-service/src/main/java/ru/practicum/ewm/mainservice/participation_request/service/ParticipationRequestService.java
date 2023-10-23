@@ -2,13 +2,13 @@ package ru.practicum.ewm.mainservice.participation_request.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.mainservice.event.State;
+import ru.practicum.ewm.mainservice.entity.ParticipationRequest;
+import ru.practicum.ewm.mainservice.entity.Status;
 import ru.practicum.ewm.mainservice.event.entity.Event;
+import ru.practicum.ewm.mainservice.event.entity.State;
 import ru.practicum.ewm.mainservice.event.repository.EventRepository;
-import ru.practicum.ewm.mainservice.participation_request.Status;
 import ru.practicum.ewm.mainservice.participation_request.dto.EventRequestStatusUpdateRequest;
-import ru.practicum.ewm.mainservice.participation_request.entity.ParticipationRequest;
-import ru.practicum.ewm.mainservice.participation_request.repository.ParticipationRequestRepository;
+import ru.practicum.ewm.mainservice.repository.ParticipationRequestRepository;
 import ru.practicum.ewm.mainservice.user.entity.User;
 import ru.practicum.ewm.mainservice.user.repository.UserRepository;
 import ru.practicum.mainservice.exception.ConditionNotMetException;
@@ -74,12 +74,13 @@ public class ParticipationRequestService {
         return requestRepository.findByInitiatorIdAndEventId(userId, eventId);
     }
 
-    public Map<Boolean, List<ParticipationRequest>> updateRequestsFromInitiator(long userId, long eventId,
-                                                                                EventRequestStatusUpdateRequest updateStatusRequest) {
+    //todo: refactor back
+    public Map<Boolean, List<ParticipationRequest>> patchRequestsFromInitiator(long userId, long eventId,
+                                                                               EventRequestStatusUpdateRequest updateStatusRequest) {
         List<ParticipationRequest> requests = requestRepository
                 .findRequests(userId, eventId, updateStatusRequest.getRequestIds());
         if (requests.isEmpty()) {
-            throw new NotFoundException("Request from event with id={0} was not found", eventId);
+            throw new NotFoundException("Event was not found [id]={0}", eventId);
         }
         Event event = requests.get(0).getEvent();
         int limit = event.getParticipantLimit() - event.getConfirmedRequests();

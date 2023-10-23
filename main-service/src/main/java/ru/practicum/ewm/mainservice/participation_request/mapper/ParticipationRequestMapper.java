@@ -2,8 +2,8 @@ package ru.practicum.ewm.mainservice.participation_request.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.practicum.ewm.mainservice.entity.ParticipationRequest;
 import ru.practicum.ewm.mainservice.participation_request.dto.ParticipationRequestDto;
-import ru.practicum.ewm.mainservice.participation_request.entity.ParticipationRequest;
 
 @Mapper(componentModel = "spring")
 public interface ParticipationRequestMapper {

@@ -3,7 +3,6 @@ package ru.practicum.ewm.mainservice.event.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.ewm.mainservice.category.entity.Category;
-import ru.practicum.ewm.mainservice.event.State;
 import ru.practicum.ewm.mainservice.event.dto.AdminUpdateEventState;
 import ru.practicum.ewm.mainservice.event.dto.EventFullDto;
 import ru.practicum.ewm.mainservice.event.dto.EventShortDto;
@@ -12,6 +11,7 @@ import ru.practicum.ewm.mainservice.event.dto.UpdateEventAdminRequest;
 import ru.practicum.ewm.mainservice.event.dto.UpdateEventDtoUserRequest;
 import ru.practicum.ewm.mainservice.event.dto.UserUpdateEventState;
 import ru.practicum.ewm.mainservice.event.entity.Event;
+import ru.practicum.ewm.mainservice.event.entity.State;
 import ru.practicum.ewm.mainservice.user.entity.User;
 
 @Mapper(componentModel = "spring")
@@ -43,6 +43,9 @@ public interface EventMapper {
     Event fromUpdateAdminRequest(UpdateEventAdminRequest updateEventDto, long id);
 
     EventFullDto toFullDto(Event event);
+
+    @Mapping(target = "commentsCount", source = "commentCount")
+    EventShortDto toShortDto(Event event, long commentCount);
 
     EventShortDto toShortDto(Event event);
 

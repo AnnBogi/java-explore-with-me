@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EventShortDto extends ResponseEventDto {
-
+  private long commentsCount;
 }

@@ -12,9 +12,13 @@
 
     <name>Explore With Me</name>
     <modules>
-        <module>main-service</module>
-        <module>stats</module>
         <module>my-spring-core</module>
+
+        <module>main-service</module>
+        <module>main-service/comments</module>
+        <module>main-service/db</module>
+        <module>stats</module>
+        <module>main-service/dto</module>
     </modules>
 
     <groupId>ru.practicum</groupId>
